@@ -1,5 +1,7 @@
 import { Reducer, useEffect, useReducer, useState } from 'react';
 import { type BigNumber, ethers } from 'ethers';
+import type { ComplexProviderArgs } from '../types/arguments';
+import { getProvider } from '../helpers/getProvider';
 import { getFeeData } from '../helpers/getFeeData';
 import { getGasUsedRatio } from '../helpers/getGasUsedRatio';
 import { calculateNextBaseFeePerGas } from '../helpers/calculateNextBaseFeePerGas';
@@ -75,12 +77,12 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 };
 
-export const useFeeSuggestion = (network: ethers.providers.Networkish = 'homestead') => {
+export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
   const [networkState, setNetworkState] = useState<ethers.providers.Network>();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    const provider = ethers.getDefaultProvider(network);
+    const provider = getProvider(args);
 
     // get network info
     provider.getNetwork().then((data) => setNetworkState(data));
@@ -135,7 +137,7 @@ export const useFeeSuggestion = (network: ethers.providers.Networkish = 'homeste
     return () => {
       provider.off('block');
     };
-  }, [network]);
+  }, []);
 
   return {
     network: networkState,
