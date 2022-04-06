@@ -4,3 +4,4 @@ tsconfig.json
 
 # Build
 /dist
+/coverage
