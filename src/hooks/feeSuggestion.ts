@@ -1,92 +1,24 @@
-import { Reducer, useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { type BigNumber, ethers } from 'ethers';
 import type { ComplexProviderArgs } from '../types/arguments';
+import { initialState, reducer } from '../helpers/reducer';
 import { getProvider } from '../helpers/getProvider';
 import { getFeeData } from '../helpers/getFeeData';
 import { getGasUsedRatio } from '../helpers/getGasUsedRatio';
 import { calculateNextBaseFeePerGas } from '../helpers/calculateNextBaseFeePerGas';
 
-type Suggestion = {
-  baseFeePerGas: BigNumber;
-  maxPriorityFeePerGas: BigNumber;
-  maxFeePerGas: BigNumber;
-};
-
-type Block = {
-  blockNumber: number;
-  baseFeePerGas: BigNumber;
-  gasUsedRatio: number;
-};
-
-type History = Block[];
-
-type State =
-  | {
-      isLoading: true;
-      data: undefined;
-    }
-  | {
-      isLoading: false;
-      data: {
-        suggestion: Suggestion;
-        latestBlock: Block;
-        history: History;
-      };
-    };
-
-type ActionTypes = 'RESTORE' | 'SET_DATA';
-
-type Action = {
-  type: ActionTypes;
-  payload: {
-    suggestion: Suggestion;
-    latestBlock: Block;
-  };
-};
-
-export const initialState: State = {
-  isLoading: true,
-  data: undefined,
-};
-
-const reducer: Reducer<State, Action> = (state, action) => {
-  switch (action.type) {
-    case 'RESTORE':
-      return initialState;
-    case 'SET_DATA':
-      return {
-        isLoading: false,
-        data: {
-          suggestion: action.payload.suggestion,
-          latestBlock: action.payload.latestBlock,
-          history: state.data
-            ? state.data.history.length
-              ? (() => {
-                  const list = [state.data.latestBlock, ...state.data.history];
-                  if (list.length > 20) {
-                    list.pop();
-                  }
-                  return list;
-                })()
-              : [state.data.latestBlock]
-            : [],
-        },
-      };
-    default:
-      return { ...state };
-  }
-};
-
 export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
-  const [networkState, setNetworkState] = useState<ethers.providers.Network>();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const provider = getProvider(args);
 
+    let network: ethers.providers.Network;
     if (provider) {
       // get network info
-      provider.getNetwork().then((data) => setNetworkState(data));
+      (async () => {
+        network = await provider.getNetwork();
+      })();
 
       // subscribe to new blocks
       provider.on('block', async (block: number) => {
@@ -116,7 +48,7 @@ export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
         ]);
 
         dispatch({
-          type: 'SET_DATA',
+          type: 'SET_STATE',
           payload: {
             suggestion: {
               baseFeePerGas:
@@ -132,8 +64,14 @@ export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
                 ethers.utils.parseUnits('0', 'gwei'),
               gasUsedRatio: (latestBlockMap.get('gasUsedRatio') as number) || 0,
             },
+            network,
           },
         });
+      });
+    } else {
+      dispatch({
+        type: 'CREATE_ERROR',
+        payload: { error: 'An error occurred when calling the provider' },
       });
     }
 
@@ -143,7 +81,6 @@ export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
   }, []);
 
   return {
-    network: networkState,
     ...state,
   };
 };

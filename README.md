@@ -7,25 +7,25 @@ import { ethers } from 'ethers';
 import { useFeeSuggestion } from '@asset-projects/use-evm-fee';
 
 const App: React.VFC = () => {
-  const { data, isLoading, network } = useFeeSuggestion();
+  const { isLoading, data, error } = useFeeSuggestion();
 
   if (isLoading) {
-    return (
-      <div>
-        <p>loading...</p>
-      </div>
-    );
+    return <p>Loading...</p>;
   }
 
-  const {
-    suggestion, // Recommended fee data when setting up a transaction
-    latestBlock, // Latest Block Information
-    history, // suggestion history
-  } = data;
+  if (!data || error) {
+    return <p>Error</p>;
+  }
+
+  const { suggestion, latestBlock, history, network } = data;
 
   return (
     <div>
       <div>
+        <h1>Network</h1>
+        <p>network name: {network.name}</p>
+        <p>chainId: {network.chainId}</p>
+
         <h1>Block</h1>
         <p>blockNumber: {latestBlock.blockNumber}</p>
         <p>
