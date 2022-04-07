@@ -31,7 +31,7 @@
     "/LICENSE"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "jest --silent",
     "build": "rimraf ./dict && tsc",
     "prepublishOnly": "npm run build"
   },

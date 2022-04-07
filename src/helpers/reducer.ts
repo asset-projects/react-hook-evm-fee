@@ -1,5 +1,5 @@
 import { Reducer } from 'react';
-import { ethers, type BigNumber } from 'ethers';
+import type { ethers, BigNumber } from 'ethers';
 
 type Suggestion = {
   baseFeePerGas: BigNumber;
