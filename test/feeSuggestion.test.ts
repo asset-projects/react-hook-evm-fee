@@ -1,14 +1,14 @@
-import { renderHook, RenderHookResult } from '@testing-library/react-hooks';
-import { useFeeSuggestion } from '../hooks/feeSuggestion';
+import { renderHook } from '@testing-library/react-hooks';
+import { useFeeSuggestion } from '../src';
 
-describe('should use feeSuggestion', () => {
+describe('useFeeSuggestion', () => {
   // let result: RenderHookResult<ethers.providers.Networkish | undefined, typeof useFeeSuggestion>;
 
   // beforeEach(() => {
   //   result = renderHook(() => useFeeSuggestion()).result;
   // });
 
-  it('should first restore state', async () => {
+  it('should be confirm first restore state', async () => {
     const { result, waitForNextUpdate } = renderHook(() => useFeeSuggestion());
 
     await waitForNextUpdate();
@@ -17,7 +17,7 @@ describe('should use feeSuggestion', () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it('shoud suggestion data', async () => {
+  it('result suggestion data', async () => {
     const { result, waitForValueToChange } = renderHook(() => useFeeSuggestion());
 
     await waitForValueToChange(() => result.current.isLoading, { timeout: 30000 });
@@ -30,4 +30,14 @@ describe('should use feeSuggestion', () => {
     expect(result.current.data?.suggestion.baseFeePerGas).toBeDefined();
     expect(result.current.data?.history).toHaveLength(1);
   }, 60000);
+
+  it('wrong network name', async () => {
+    const { result, waitForValueToChange } = renderHook(() => useFeeSuggestion('super-network'));
+
+    await waitForValueToChange(() => result.current.isLoading, { timeout: 10000 });
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.network).toBeUndefined();
+  });
 });
