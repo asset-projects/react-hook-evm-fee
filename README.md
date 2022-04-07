@@ -4,7 +4,7 @@
 
 ```tsx
 import { ethers } from 'ethers';
-import { useFeeSuggestion } from '@asset-projects/use-evm-fee';
+import { useFeeSuggestion } from 'use-evm-fee';
 
 const App: React.VFC = () => {
   const { isLoading, data, error } = useFeeSuggestion();
