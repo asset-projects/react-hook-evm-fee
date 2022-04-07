@@ -84,58 +84,61 @@ export const useFeeSuggestion = (args?: ComplexProviderArgs) => {
   useEffect(() => {
     const provider = getProvider(args);
 
-    // get network info
-    provider.getNetwork().then((data) => setNetworkState(data));
+    if (provider) {
+      // get network info
+      provider.getNetwork().then((data) => setNetworkState(data));
 
-    // subscribe to new blocks
-    provider.on('block', async (block: number) => {
-      const suggestMap = new Map<string, BigNumber>();
-      const latestBlockMap = new Map<string, BigNumber | number>();
+      // subscribe to new blocks
+      provider.on('block', async (block: number) => {
+        const suggestMap = new Map<string, BigNumber>();
+        const latestBlockMap = new Map<string, BigNumber | number>();
 
-      await Promise.all([
-        (async () => {
-          const { maxFeePerGas, maxPriorityFeePerGas } = await getFeeData(provider);
-          if (maxFeePerGas) suggestMap.set('maxFeePerGas', maxFeePerGas);
-          if (maxPriorityFeePerGas) suggestMap.set('maxPriorityFeePerGas', maxPriorityFeePerGas);
-        })(),
-        (async () => {
-          const { gasUsedRatio, baseFeePerGas } = await getGasUsedRatio(provider, block);
-          latestBlockMap.set('gasUsedRatio', gasUsedRatio);
+        await Promise.all([
+          (async () => {
+            const { maxFeePerGas, maxPriorityFeePerGas } = await getFeeData(provider);
+            if (maxFeePerGas) suggestMap.set('maxFeePerGas', maxFeePerGas);
+            if (maxPriorityFeePerGas) suggestMap.set('maxPriorityFeePerGas', maxPriorityFeePerGas);
+          })(),
+          (async () => {
+            const { gasUsedRatio, baseFeePerGas } = await getGasUsedRatio(provider, block);
+            latestBlockMap.set('gasUsedRatio', gasUsedRatio);
 
-          if (baseFeePerGas) {
-            latestBlockMap.set('baseFeePerGas', baseFeePerGas);
-            const nextBaseFeePerGas = calculateNextBaseFeePerGas(
-              Number(ethers.utils.formatUnits(baseFeePerGas, 'gwei')),
-              gasUsedRatio,
-            );
+            if (baseFeePerGas) {
+              latestBlockMap.set('baseFeePerGas', baseFeePerGas);
+              const nextBaseFeePerGas = calculateNextBaseFeePerGas(
+                Number(ethers.utils.formatUnits(baseFeePerGas, 'gwei')),
+                gasUsedRatio,
+              );
 
-            suggestMap.set('baseFeePerGas', nextBaseFeePerGas);
-          }
-        })(),
-      ]);
+              suggestMap.set('baseFeePerGas', nextBaseFeePerGas);
+            }
+          })(),
+        ]);
 
-      dispatch({
-        type: 'SET_DATA',
-        payload: {
-          suggestion: {
-            baseFeePerGas: suggestMap.get('baseFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
-            maxPriorityFeePerGas:
-              suggestMap.get('maxPriorityFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
-            maxFeePerGas: suggestMap.get('maxFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
+        dispatch({
+          type: 'SET_DATA',
+          payload: {
+            suggestion: {
+              baseFeePerGas:
+                suggestMap.get('baseFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
+              maxPriorityFeePerGas:
+                suggestMap.get('maxPriorityFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
+              maxFeePerGas: suggestMap.get('maxFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
+            },
+            latestBlock: {
+              blockNumber: block,
+              baseFeePerGas:
+                (latestBlockMap.get('baseFeePerGas') as BigNumber) ||
+                ethers.utils.parseUnits('0', 'gwei'),
+              gasUsedRatio: (latestBlockMap.get('gasUsedRatio') as number) || 0,
+            },
           },
-          latestBlock: {
-            blockNumber: block,
-            baseFeePerGas:
-              (latestBlockMap.get('baseFeePerGas') as BigNumber) ||
-              ethers.utils.parseUnits('0', 'gwei'),
-            gasUsedRatio: (latestBlockMap.get('gasUsedRatio') as number) || 0,
-          },
-        },
+        });
       });
-    });
+    }
 
     return () => {
-      provider.off('block');
+      provider && provider.off('block');
     };
   }, []);
 

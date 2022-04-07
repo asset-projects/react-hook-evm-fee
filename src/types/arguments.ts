@@ -2,6 +2,10 @@ import type { ethers } from 'ethers';
 
 type DefaultProviderArgs = ethers.providers.Networkish;
 
+type JsonRpcProviderArgs = {
+  url: string;
+};
+
 type InfuraProviderArgs = {
   network: ethers.providers.Networkish;
   infura: {
@@ -17,12 +21,8 @@ type AlchemyProviderArgs = {
   };
 };
 
-type JsonRpcProviderArgs = {
-  url: string;
-};
-
 export type ComplexProviderArgs =
   | DefaultProviderArgs
+  | JsonRpcProviderArgs
   | InfuraProviderArgs
-  | AlchemyProviderArgs
-  | JsonRpcProviderArgs;
+  | AlchemyProviderArgs;
