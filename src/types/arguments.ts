@@ -1,8 +1,6 @@
 import type { ethers } from 'ethers';
 
-type DefaultProviderArgs = {
-  network?: ethers.providers.Networkish;
-};
+type DefaultProviderArgs = ethers.providers.Networkish;
 
 type InfuraProviderArgs = {
   network: ethers.providers.Networkish;
@@ -15,7 +13,7 @@ type InfuraProviderArgs = {
 type AlchemyProviderArgs = {
   network: ethers.providers.Networkish;
   alchemy: {
-    apiKey: string;
+    apiKey?: string;
   };
 };
 

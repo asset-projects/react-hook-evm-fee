@@ -4,7 +4,7 @@ import type { ComplexProviderArgs } from '../types/arguments';
 export const getProvider = (args?: ComplexProviderArgs) => {
   let newProvider;
 
-  if (args) {
+  if (typeof args === 'object') {
     if ('url' in args) {
       newProvider = new ethers.providers.JsonRpcProvider(args.url);
     } else if ('infura' in args) {
@@ -13,11 +13,12 @@ export const getProvider = (args?: ComplexProviderArgs) => {
       newProvider = new ethers.providers.InfuraProvider(args.network, secondArgument);
     } else if ('alchemy' in args) {
       const { apiKey } = args.alchemy;
-      newProvider = new ethers.providers.AlchemyProvider(apiKey);
+      newProvider = new ethers.providers.AlchemyProvider(args.network, apiKey);
     } else {
-      const network = args.network || 'homestead';
-      newProvider = ethers.getDefaultProvider(network);
+      newProvider = ethers.getDefaultProvider();
     }
+  } else if (typeof args === 'string') {
+    newProvider = ethers.getDefaultProvider(args);
   } else {
     newProvider = ethers.getDefaultProvider();
   }
