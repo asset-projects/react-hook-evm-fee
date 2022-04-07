@@ -1,4 +1,4 @@
-# @asset-projects/use-evm-fee
+# use-evm-fee
 
 ## Example
 
