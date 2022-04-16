@@ -1,6 +1,10 @@
 import type { ethers } from 'ethers';
 
-type DefaultProviderArgs = ethers.providers.Networkish;
+type DefaultProviderArgs =
+  | ethers.providers.Networkish
+  | {
+      network: ethers.providers.Networkish;
+    };
 
 type JsonRpcProviderArgs = {
   url: string;

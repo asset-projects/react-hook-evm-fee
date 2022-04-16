@@ -13,6 +13,8 @@ export const getProvider = (args?: ComplexProviderArgs) => {
       } else if ('alchemy' in args) {
         const { apiKey } = args.alchemy;
         return new ethers.providers.AlchemyProvider(args.network, apiKey);
+      } else if ('network' in args) {
+        return ethers.getDefaultProvider(args.network);
       }
 
       console.warn('Invalid provider arguments');
