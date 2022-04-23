@@ -24,22 +24,50 @@ export const useEVMFee = (args?: Args) => {
   }, [args?.debug, state.provider]);
 
   const initProvider = useCallback(
-    async (args?: ComplexProviderArgs) => {
-      state.provider && state.provider.off('block');
-
-      const newProvider = getProvider(args);
-      if (newProvider) {
-        const newNetwork = await newProvider.getNetwork();
-
-        if (!state.network || state.network.chainId !== newNetwork.chainId) {
-          dispatch({
-            type: 'RESET_PROVIDER',
-            payload: { provider: newProvider, network: newNetwork },
-          });
-        }
+    async (networkArgs?: ComplexProviderArgs) => {
+      const newProvider = getProvider(networkArgs);
+      if (!newProvider) {
+        args?.debug && console.log('initProvider', 'no provider');
+        return dispatch({
+          type: 'CREATE_ERROR',
+          payload: { error: 'Failed to connect to network. args value is wrong' },
+        });
       }
+
+      const newNetwork = newProvider.network ?? (await newProvider.getNetwork());
+
+      // When the provider does not exist
+      if (!state.provider) {
+        args?.debug && console.log('initProvider', 'new provider (first)');
+        return dispatch({
+          type: 'RESET_PROVIDER',
+          payload: { provider: newProvider, network: newNetwork },
+        });
+      }
+
+      if (newNetwork.chainId === state.network?.chainId) {
+        args?.debug && console.log('initProvider', 'same network');
+        return dispatch({
+          type: 'CREATE_ERROR',
+          payload: {
+            error:
+              'The network received in args is the same as the previous one, so it is not updated',
+          },
+        });
+      }
+
+      if (state.provider.listenerCount('block') > 0) {
+        args?.debug && console.log('initProvider', 'remove listener');
+        state.provider.off('block');
+      }
+
+      args?.debug && console.log('initProvider', 'new provider (update)');
+      return dispatch({
+        type: 'RESET_PROVIDER',
+        payload: { provider: newProvider, network: newNetwork },
+      });
     },
-    [state.provider, state.network],
+    [args?.debug, state.provider, state.network],
   );
 
   const subscribe = useCallback(() => {
@@ -180,6 +208,7 @@ type Action =
       type: 'CREATE_ERROR';
       payload: {
         error: Error;
+        cleanup?: boolean;
       };
     };
 
@@ -223,12 +252,20 @@ const reducer: Reducer<State, Action> = (state, action) => {
         },
       };
     case 'CREATE_ERROR':
+      if (action.payload.cleanup) {
+        if (state.subscribe && state.provider) {
+          state.provider.off('block');
+        }
+
+        return {
+          ...initialState,
+          error: action.payload.error,
+        };
+      }
+
       return {
         ...state,
-        data: undefined,
         error: action.payload.error,
       };
-    default:
-      return { ...state };
   }
 };

@@ -1,6 +1,13 @@
+import 'dotenv/config';
 import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
 import type { ComplexProviderArgs } from '../src/types/arguments';
 import { State, useEVMFee } from '../src';
+
+let rpcUrl: string;
+
+beforeAll(() => {
+  rpcUrl = process.env.JSON_RPC_URL ?? 'http://localhost:8545';
+});
 
 describe('useEVMFee', () => {
   let hook: RenderHookResult<
@@ -15,7 +22,7 @@ describe('useEVMFee', () => {
   >;
 
   beforeEach(() => {
-    hook = renderHook(() => useEVMFee({ debug: false }));
+    hook = renderHook(() => useEVMFee({ debug: true }));
   });
 
   it('should be confirm first state', () => {
@@ -42,7 +49,7 @@ describe('useEVMFee', () => {
     expect(result.current.state.error).toBeUndefined();
   });
 
-  it('Test initProvider() (Run again and set another network)', async () => {
+  it('Test initProvider(). Run again and set another network', async () => {
     const { result } = hook;
 
     await act(async () => {
@@ -57,11 +64,57 @@ describe('useEVMFee', () => {
     });
 
     expect(result.current.state.provider).toBeDefined();
-    expect(result.current.state.network.chainId).toBe(3);
+    expect(result.current.state.network?.chainId).toBe(3);
+  });
+
+  it('Test initProvider(). Run again and set same network', async () => {
+    const { result } = hook;
+
+    await act(async () => {
+      await result.current.initProvider();
+    });
+
+    expect(result.current.state.provider).toBeDefined();
+    expect(result.current.state.network).toBeDefined();
+    expect(result.current.state.error).toBeUndefined();
+
+    await act(async () => {
+      await result.current.initProvider({ url: rpcUrl });
+    });
+
+    expect(result.current.state.provider).toBeDefined();
+    expect(result.current.state.network?.chainId).toBe(1);
+    expect(result.current.state.error).toBeDefined();
+  });
+
+  it('Test initProvider(). Set non-existent network', async () => {
+    const { result } = hook;
+
+    await act(async () => {
+      await result.current.initProvider('super network');
+    });
+
+    expect(result.current.state.error).toBeDefined();
+  });
+
+  it('Test initProvider(). Set network not present during execution', async () => {
+    const { result } = hook;
+
+    await act(async () => {
+      await result.current.initProvider();
+    });
+
+    expect(result.current.state.error).toBeUndefined();
+
+    await act(async () => {
+      await result.current.initProvider('super network');
+    });
+
+    expect(result.current.state.error).toBeDefined();
   });
 
   test('Test subscribe()', async () => {
-    const { result, waitForValueToChange } = hook;
+    const { result, waitForValueToChange, unmount } = hook;
 
     await act(async () => {
       await result.current.initProvider();
@@ -80,14 +133,18 @@ describe('useEVMFee', () => {
 
     expect(result.current.state.data).toBeDefined();
     expect(result.current.state.error).toBeUndefined();
-    expect(result.current.state.data.history).toHaveLength(0);
+    expect(result.current.state.data?.history).toHaveLength(0);
 
-    await waitForValueToChange(() => result.current.state.data.suggestion, { timeout: 30000 });
-    expect(result.current.state.data.history).toHaveLength(1);
+    await waitForValueToChange(() => result.current.state.data?.suggestion, { timeout: 50000 });
+    expect(result.current.state.data?.history).toHaveLength(1);
 
-    await waitForValueToChange(() => result.current.state.data.suggestion, { timeout: 30000 });
-    expect(result.current.state.data.history).toHaveLength(2);
-  }, 100000);
+    await waitForValueToChange(() => result.current.state.data?.suggestion, { timeout: 50000 });
+    expect(result.current.state.data?.history).toHaveLength(2);
+
+    act(() => {
+      unmount();
+    });
+  }, 130000);
 
   test('Test unsubscribe()', async () => {
     const { result } = hook;
@@ -127,11 +184,11 @@ describe('useEVMFee', () => {
     });
 
     expect(result.current.state.provider).toBeDefined();
-    expect(result.current.state.network.chainId).toBe(3);
+    expect(result.current.state.network?.chainId).toBe(3);
   });
 
   test('Test reset()', async () => {
-    const { result, waitForValueToChange } = hook;
+    const { result, waitForValueToChange, unmount } = hook;
 
     await act(async () => {
       await result.current.initProvider();
@@ -147,7 +204,7 @@ describe('useEVMFee', () => {
 
     expect(result.current.state.data).toBeDefined();
     expect(result.current.state.error).toBeUndefined();
-    expect(result.current.state.data.history).toHaveLength(0);
+    expect(result.current.state.data?.history).toHaveLength(0);
 
     act(() => {
       result.current.reset();
@@ -158,6 +215,10 @@ describe('useEVMFee', () => {
     expect(result.current.state.network).toBeUndefined();
     expect(result.current.state.data).toBeUndefined();
     expect(result.current.state.error).toBeUndefined();
+
+    act(() => {
+      unmount();
+    });
   }, 60000);
 
   test('Unmount during subscribe', async () => {
@@ -179,6 +240,6 @@ describe('useEVMFee', () => {
       unmount();
     });
 
-    expect(provider.listenerCount('block')).toBe(0);
+    expect(provider?.listenerCount('block')).toBe(0);
   });
 });
