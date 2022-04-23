@@ -111,12 +111,12 @@ describe('Test reducer', () => {
       result.current.setFullList();
     });
 
-    expect(result.current.state.data.history).toHaveLength(20);
+    expect(result.current.state.data?.history).toHaveLength(20);
 
     act(() => {
       result.current.setState();
     });
 
-    expect(result.current.state.data.history).toHaveLength(20);
+    expect(result.current.state.data?.history).toHaveLength(20);
   });
 });

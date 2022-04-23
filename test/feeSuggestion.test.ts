@@ -61,16 +61,16 @@ describe('useFeeSuggestion', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeUndefined();
     expect(result.current.data).toBeDefined();
-    expect(result.current.data.network).toBeDefined();
-    expect(result.current.data.history).toHaveLength(0);
+    expect(result.current.data?.network).toBeDefined();
+    expect(result.current.data?.history).toHaveLength(0);
 
     await waitForValueToChange(() => result.current.data, { timeout: 30000 });
 
     expect(result.current.data).toBeDefined();
-    expect(result.current.data.network).toBeDefined();
-    expect(result.current.data.latestBlock).toBeDefined();
-    expect(result.current.data.suggestion).toBeDefined();
-    expect(result.current.data.history).toHaveLength(1);
+    expect(result.current.data?.network).toBeDefined();
+    expect(result.current.data?.latestBlock).toBeDefined();
+    expect(result.current.data?.suggestion).toBeDefined();
+    expect(result.current.data?.history).toHaveLength(1);
 
     unmount();
   }, 36000);
