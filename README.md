@@ -4,35 +4,27 @@
 
 ```tsx
 import { ethers } from 'ethers';
-import { useFeeSuggestion } from 'use-evm-fee';
+import { useEVMFeeListener } from 'use-evm-fee';
 
-const App: React.VFC = () => {
-  const { isLoading, data, error } = useFeeSuggestion();
+const App: React.FC = () => {
+  const { subscribe, network, data } = useEVMFeeListener();
 
-  if (isLoading) {
-    return <p>Loading...</p>;
+  if (!subscribe || !data || !network) {
+    return <div>loading...</div>;
   }
 
-  if (!data || error) {
-    return <p>Error</p>;
-  }
-
-  const { suggestion, latestBlock, history, network } = data;
+  const { latestBlock, suggestion, history } = data;
 
   return (
     <div>
-      <div>
-        <h1>Network</h1>
-        <p>network name: {network.name}</p>
-        <p>chainId: {network.chainId}</p>
+      <h1>Network</h1>
+      <p>network name: {network.name}</p>
+      <p>chainId: {network.chainId}</p>
 
-        <h1>Block</h1>
-        <p>blockNumber: {latestBlock.blockNumber}</p>
-        <p>
-          {`baseFeePerGas: ${ethers.utils.formatUnits(latestBlock.baseFeePerGas, 'gwei')} gwei`}
-        </p>
-        <p>gasUsedRatio: {latestBlock.gasUsedRatio}</p>
-      </div>
+      <h1>Block</h1>
+      <p>blockNumber: {data.latestBlock.blockNumber}</p>
+      <p>{`baseFeePerGas: ${ethers.utils.formatUnits(latestBlock.baseFeePerGas, 'gwei')} gwei`}</p>
+      <p>gasUsedRatio: {latestBlock.gasUsedRatio}</p>
 
       <div>
         <h1>Suggestion</h1>

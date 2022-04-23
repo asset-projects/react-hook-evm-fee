@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
-import type { ComplexProviderArgs } from '../src/types/arguments';
-import { State, useEVMFee } from '../src';
+import { type State, type ComplexProviderArgs, useEVMFee } from '../src';
 
 let rpcUrl: string;
 
