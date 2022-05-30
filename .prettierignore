@@ -3,5 +3,5 @@ tsconfig.json
 
 
 # Build
-/dist
+/lib
 /coverage

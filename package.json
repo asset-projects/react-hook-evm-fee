@@ -12,11 +12,11 @@
     "url": "https://github.com/asset-projects/react-hook-evm-fee/issues"
   },
   "homepage": "https://github.com/asset-projects/react-hook-evm-fee#readme",
-  "main": "dist/index.js",
-  "types": "dist/typescript/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/typescript/index.d.ts",
   "files": [
     "/src",
-    "/dict",
+    "/lib",
     "/README.md",
     "/LICENSE"
   ],
@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "test": "jest --silent",
-    "build": "rimraf ./dict && tsc",
+    "build": "rimraf ./lib && tsc",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
