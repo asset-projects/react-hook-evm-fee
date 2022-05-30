@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
-import { type State, type ComplexProviderArgs, useEVMFee } from '../src';
+import { useEVMFee } from '../src';
 
 let rpcUrl: string;
 
@@ -9,16 +9,7 @@ beforeAll(() => {
 });
 
 describe('useEVMFee', () => {
-  let hook: RenderHookResult<
-    { debug: boolean },
-    {
-      state: State;
-      initProvider: (args?: ComplexProviderArgs | undefined) => Promise<void>;
-      subscribe: () => void;
-      unsubscribe: () => void;
-      reset: () => void;
-    }
-  >;
+  let hook: RenderHookResult<{ debug: boolean }, ReturnType<typeof useEVMFee>>;
 
   beforeEach(() => {
     hook = renderHook(() => useEVMFee({ debug: true }));
