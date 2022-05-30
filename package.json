@@ -1,17 +1,9 @@
 {
+  "version": "1.0.0",
   "name": "use-evm-fee",
   "description": "",
   "author": "@asset-projects",
-  "version": "1.0.0",
-  "keywords": [
-    "react",
-    "hooks",
-    "typescript",
-    "Ethers",
-    "EVM",
-    "Ethereum",
-    "Polygon"
-  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/asset-projects/react-hook-evm-fee.git"
@@ -20,15 +12,22 @@
     "url": "https://github.com/asset-projects/react-hook-evm-fee/issues"
   },
   "homepage": "https://github.com/asset-projects/react-hook-evm-fee#readme",
-  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/typescript/index.d.ts",
   "files": [
-    "/src",
     "/dict",
     "/package.json",
     "/README.md",
     "/LICENSE"
+  ],
+  "keywords": [
+    "react",
+    "hooks",
+    "typescript",
+    "ethers",
+    "EVM",
+    "Ethereum",
+    "Polygon"
   ],
   "scripts": {
     "test": "jest --silent",
