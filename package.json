@@ -15,8 +15,8 @@
   "main": "dist/index.js",
   "types": "dist/typescript/index.d.ts",
   "files": [
+    "/src",
     "/dict",
-    "/package.json",
     "/README.md",
     "/LICENSE"
   ],
