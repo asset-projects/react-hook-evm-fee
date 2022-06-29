@@ -22,6 +22,7 @@ export type State = {
   subscribe: boolean;
   provider?: Provider;
   network?: Network;
+  isSupportEIP1559?: boolean;
   data?: {
     suggestion: Suggestion;
     latestBlock: Block;
