@@ -42,6 +42,7 @@ export const GasPrice: React.FC = () => {
 
       <div className="pt-4">
         <h2 className="text-xl font-bold">Suggestion</h2>
+        <p>gas price: {ethers.utils.formatUnits(suggestion.gasPrice, 'gwei')} gwei</p>
         <p>Base fee per gas: {ethers.utils.formatUnits(suggestion.baseFeePerGas, 'gwei')} gwei</p>
         <p>
           Max priority fee per gas:{' '}

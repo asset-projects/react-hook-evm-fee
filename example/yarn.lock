@@ -8795,10 +8795,10 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-use-evm-fee@^1.0.0-alpha.2:
-  version "1.0.0-alpha.2"
-  resolved "https://registry.npmjs.org/use-evm-fee/-/use-evm-fee-1.0.0-alpha.2.tgz"
-  integrity sha512-uonpMYzyScmh/BHXCvglvsFR4PCjXB77EbGP9yCeMknBuuIrFoof8ioigEz3xNejxQ67NDOFtZil3v9GuTHEXg==
+use-evm-fee@^1.0.0-alpha.3:
+  version "1.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/use-evm-fee/-/use-evm-fee-1.0.0-alpha.3.tgz#2af40cc2cf33f311616d4cd40d4a19d085036db2"
+  integrity sha512-LzG5LSfNRfjCvoQtNbVfVlBwqCF3saBhmdignSgg0RqSsR8ooDEnhFd0zj6bUF401qkcT7BaS8wBNz6sU0RM8w==
   dependencies:
     ethers "^5.6.8"
     lodash "^4.17.21"
