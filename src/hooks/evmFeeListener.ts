@@ -26,7 +26,6 @@ export const useEVMFeeListener = (args?: ComplexProviderArgs) => {
   useEffect(() => {
     if (isReady) {
       (async () => {
-        console.log('setup provider');
         await initProvider(args);
       })();
     }

@@ -89,7 +89,8 @@ export const useEVMFee = (args?: Args) => {
 
       await Promise.all([
         (async () => {
-          const { maxFeePerGas, maxPriorityFeePerGas } = await getFeeData(provider);
+          const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = await getFeeData(provider);
+          if (gasPrice) suggestMap.set('gasPrice', gasPrice);
           if (maxFeePerGas) suggestMap.set('maxFeePerGas', maxFeePerGas);
           if (maxPriorityFeePerGas) suggestMap.set('maxPriorityFeePerGas', maxPriorityFeePerGas);
         })(),
@@ -113,6 +114,7 @@ export const useEVMFee = (args?: Args) => {
         type: 'NEW_BLOCK',
         payload: {
           suggestion: {
+            gasPrice: suggestMap.get('gasPrice') || ethers.utils.parseUnits('0', 'gwei'),
             baseFeePerGas: suggestMap.get('baseFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas:
               suggestMap.get('maxPriorityFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),

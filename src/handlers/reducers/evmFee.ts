@@ -3,6 +3,7 @@ import { type BigNumber } from 'ethers';
 import type { Network, Provider } from '../../types/provider';
 
 type Suggestion = {
+  gasPrice: BigNumber;
   baseFeePerGas: BigNumber;
   maxPriorityFeePerGas: BigNumber;
   maxFeePerGas: BigNumber;
