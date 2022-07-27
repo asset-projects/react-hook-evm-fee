@@ -3,6 +3,7 @@ import { type BigNumber } from 'ethers';
 import type { Network, Provider } from '../../types/provider';
 
 type Suggestion = {
+  gasPrice: BigNumber;
   baseFeePerGas: BigNumber;
   maxPriorityFeePerGas: BigNumber;
   maxFeePerGas: BigNumber;
@@ -22,6 +23,7 @@ export type State = {
   subscribe: boolean;
   provider?: Provider;
   network?: Network;
+  isSupportEIP1559?: boolean;
   data?: {
     suggestion: Suggestion;
     latestBlock: Block;

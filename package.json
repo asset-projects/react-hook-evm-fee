@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "name": "use-evm-fee",
   "description": "",
   "author": "@asset-projects",
@@ -29,6 +29,9 @@
     "Ethereum",
     "Polygon"
   ],
+  "engines": {
+    "node": "^12.20.0 || ^14.16.0 || >=16.0.0"
+  },
   "scripts": {
     "test": "jest --silent",
     "build": "rimraf ./lib && tsc",

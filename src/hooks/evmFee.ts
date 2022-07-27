@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { type BigNumber, ethers } from 'ethers';
 import type { ComplexProviderArgs } from '../types/arguments';
+import { initialState, reducer } from '../handlers/reducers/evmFee';
 import { getProvider } from '../helpers/getProvider';
 import { getFeeData } from '../helpers/getFeeData';
 import { getGasUsedRatio } from '../helpers/getGasUsedRatio';
 import { calculateNextBaseFeePerGas } from '../helpers/calculateNextBaseFeePerGas';
-import { initialState, reducer } from '../handlers/reducers/evmFee';
+import { checkSupportEIP1559 } from '../helpers/supportEip15559';
 
 type Args = {
   debug: boolean;
@@ -36,12 +37,14 @@ export const useEVMFee = (args?: Args) => {
 
       const newNetwork = newProvider.network ?? (await newProvider.getNetwork());
 
+      const isSupportEIP1559 = checkSupportEIP1559(newNetwork.chainId);
+
       // When the provider does not exist
       if (!state.provider) {
         args?.debug && console.log('initProvider', 'new provider (first)');
         return dispatch({
           type: 'RESET_PROVIDER',
-          payload: { provider: newProvider, network: newNetwork },
+          payload: { provider: newProvider, network: newNetwork, isSupportEIP1559 },
         });
       }
 
@@ -64,7 +67,7 @@ export const useEVMFee = (args?: Args) => {
       args?.debug && console.log('initProvider', 'new provider (update)');
       return dispatch({
         type: 'RESET_PROVIDER',
-        payload: { provider: newProvider, network: newNetwork },
+        payload: { provider: newProvider, network: newNetwork, isSupportEIP1559 },
       });
     },
     [args?.debug, state.provider, state.network],
@@ -86,7 +89,8 @@ export const useEVMFee = (args?: Args) => {
 
       await Promise.all([
         (async () => {
-          const { maxFeePerGas, maxPriorityFeePerGas } = await getFeeData(provider);
+          const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = await getFeeData(provider);
+          if (gasPrice) suggestMap.set('gasPrice', gasPrice);
           if (maxFeePerGas) suggestMap.set('maxFeePerGas', maxFeePerGas);
           if (maxPriorityFeePerGas) suggestMap.set('maxPriorityFeePerGas', maxPriorityFeePerGas);
         })(),
@@ -110,6 +114,7 @@ export const useEVMFee = (args?: Args) => {
         type: 'NEW_BLOCK',
         payload: {
           suggestion: {
+            gasPrice: suggestMap.get('gasPrice') || ethers.utils.parseUnits('0', 'gwei'),
             baseFeePerGas: suggestMap.get('baseFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
             maxPriorityFeePerGas:
               suggestMap.get('maxPriorityFeePerGas') || ethers.utils.parseUnits('0', 'gwei'),
