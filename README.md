@@ -1,5 +1,12 @@
 # use-evm-fee
 
+# Install
+
+```zsh
+yarn add ethers
+yarn add use-evm-fee
+```
+
 ## Example
 
 ```tsx
