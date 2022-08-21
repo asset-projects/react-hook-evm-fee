@@ -57,3 +57,7 @@ const App: React.FC = () => {
   );
 };
 ```
+
+# LICENSE
+
+MIT
